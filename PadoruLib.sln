@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PadoruLib", "PadoruLib\PadoruLib.csproj", "{972FE3A9-D5BE-48D0-9783-760AE1392A15}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{972FE3A9-D5BE-48D0-9783-760AE1392A15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{972FE3A9-D5BE-48D0-9783-760AE1392A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{972FE3A9-D5BE-48D0-9783-760AE1392A15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{972FE3A9-D5BE-48D0-9783-760AE1392A15}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {878A585D-6502-4127-8847-69493FB5B13F}
+	EndGlobalSection
+EndGlobal
