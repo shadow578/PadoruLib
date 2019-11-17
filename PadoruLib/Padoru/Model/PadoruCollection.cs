@@ -11,12 +11,6 @@ namespace PadoruLib.Padoru.Model
     public class PadoruCollection
     {
         /// <summary>
-        /// the path of the (json) file this collection was loaded from
-        /// </summary>
-        [JsonIgnore]
-        public string LoadedFrom { get; set; }
-
-        /// <summary>
         /// The Entries in this collection
         /// </summary>
         public List<PadoruEntry> Entries { get; set; }
@@ -27,21 +21,20 @@ namespace PadoruLib.Padoru.Model
         public DateTime LastChange { get; set; }
 
         /// <summary>
-        /// Load the collection from a (json) file
+        /// Load the collection from a (json) string
         /// </summary>
-        /// <param name="filePath">the path to the (json) file</param>
+        /// <param name="json">the json string</param>
         /// <returns>the loaded collection</returns>
-        public static PadoruCollection FromFile(string filePath)
+        public static PadoruCollection FromJson(string json)
         {
             //read from file
-            using (StreamReader reader = File.OpenText(filePath))
+            using (StringReader reader = new StringReader(json))
             {
                 //read serialized object
                 PadoruCollection collection = GetSerializer().Deserialize(reader, typeof(PadoruCollection)) as PadoruCollection;
 
                 //set load path and and collection root of entries
-                collection.LoadedFrom = filePath;
-                string collectionRoot = Path.GetDirectoryName(filePath);
+                string collectionRoot = Path.GetDirectoryName(json);
                 foreach (PadoruEntry entry in collection.Entries)
                 {
                     entry.CollectionRoot = collectionRoot;
@@ -60,35 +53,9 @@ namespace PadoruLib.Padoru.Model
         {
             return new PadoruCollection()
             {
-                LoadedFrom = string.Empty,
                 Entries = new List<PadoruEntry>(),
                 LastChange = DateTime.Now
             };
-        }
-
-        /// <summary>
-        /// Save the collection to a (json) file
-        /// </summary>
-        /// <param name="filePath">the path to the (json) file. if empty, the path in LoadedFrom is used</param>
-        public void ToFile(string filePath = "")
-        {
-            //default path to LoadedFrom
-            if (string.IsNullOrWhiteSpace(filePath)) filePath = LoadedFrom;
-            if (string.IsNullOrWhiteSpace(filePath)) throw new InvalidOperationException("filePath is empty!");
-
-            //create required directorys
-            string dirPath = Path.GetDirectoryName(filePath);
-            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-
-            //update last changed date
-            LastChange = DateTime.Now;
-
-            //write to file
-            using (StreamWriter writer = File.CreateText(filePath))
-            {
-                //write serialized object 
-                GetSerializer().Serialize(writer, this);
-            }
         }
 
         /// <summary>
