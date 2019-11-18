@@ -1,5 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace PadoruLib.Padoru.Model
 {
@@ -8,16 +12,42 @@ namespace PadoruLib.Padoru.Model
     /// </summary>
     public class PadoruEntry
     {
+        #region Non- Serialized Properties
         /// <summary>
-        /// The full path to the root directory of the collection this entry is a part of
+        /// The collection this entry is a part of
         /// </summary>
         [JsonIgnore]
-        public string CollectionRoot { get; set; }
+        public PadoruCollection ParentCollection { get; set; }
 
+        /// <summary>
+        /// Has this entry a valid image url?
+        /// </summary>
+        /// <remarks>This does not check if the image url is actually reachable</remarks>
+        public bool HasValidImageUrl
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(ImageUrl) && Uri.IsWellFormedUriString(ImageUrl, UriKind.Absolute);
+            }
+        }
+
+        /// <summary>
+        /// Has this entry a valid (and existing) local image file?
+        /// </summary>
+        public bool HasValidImagePath
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath);
+            }
+        }
+        #endregion
+
+        #region Serialized Properties
         /// <summary>
         /// A Unique id for this entry
         /// </summary>
-        public long Id { get; set; }
+        public Guid UID { get; set; }
 
         /// <summary>
         /// The Image url (in the github repo)
@@ -49,7 +79,7 @@ namespace PadoruLib.Padoru.Model
         /// This Character's MAL character id
         /// </summary>
         /// <remarks>This field is optional and may be null/empty</remarks>
-        public string MALId { get; set; }
+        public long? MALId { get; set; }
 
         /// <summary>
         /// The Name of the Person that contributed the image (=/= creator)
@@ -66,23 +96,74 @@ namespace PadoruLib.Padoru.Model
         /// </summary>
         /// <remarks>This field is optional and may be null/empty</remarks>
         public string ImageSource { get; set; }
+        #endregion
 
+        #region Functions
+        /// <summary>
+        /// Create a new entry with a new, random id
+        /// </summary>
         public PadoruEntry()
         {
-            Random rnd = new Random();
-            Id = ((long)rnd.Next() << sizeof(int)) & (long)rnd.Next();
+            UID = Guid.NewGuid();
         }
 
+        /// <summary>
+        /// Get this entry's image from the image url
+        /// </summary>
+        /// <param name="fallbackImage">the image to fall back in case no local image can be loaded</param>
+        /// <returns>the loaded image, or the value of fallbackImage</returns>
+        public async Task<Image> GetImage(Image fallbackImage = null)
+        {
+            //download image from the remote url
+            Image entryImg = fallbackImage;
+            if (HasValidImageUrl)
+            {
+                //download image into memory stream
+                using (WebClient web = new WebClient())
+                using (MemoryStream imgStream = new MemoryStream(await web.DownloadDataTaskAsync(ImageUrl)))
+                {
+                    //load image from stream
+                    entryImg = Image.FromStream(imgStream);
+                }
+            }
+
+            return entryImg;
+        }
+
+        /// <summary>
+        /// Get this entry's image from the local path
+        /// </summary>
+        /// <param name="fallbackImage">the image to fall back in case no local image can be loaded</param>
+        /// <returns>the loaded image, or the value of fallbackImage</returns>
+        public Image GetLocalImage(Image fallbackImage = null)
+        {
+            //load the image from local path
+            Image entryImg = fallbackImage;
+            if (HasValidImagePath)
+            {
+                entryImg = Image.FromFile(ImagePath);
+            }
+
+            return entryImg;
+        }
+
+        /// <summary>
+        /// Get a string representation of this entry (format is {Name} (MAL ID))
+        /// </summary>
+        /// <returns>the string representation of this entry</returns>
         public override string ToString()
         {
-            if (string.IsNullOrWhiteSpace(MALId))
+            if (MALId.HasValue)
             {
-                return $"{Name} (---)";
+                //have mal id, include it
+                return $"{Name} ({MALId.Value})";
             }
             else
             {
-                return $"{Name} ({MALId})";
+                //no mal id, nothing to include
+                return Name;
             }
         }
+        #endregion
     }
 }
