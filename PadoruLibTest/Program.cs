@@ -3,8 +3,6 @@ using PadoruLib.Padoru.Model;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PadoruLibTest
@@ -13,14 +11,14 @@ namespace PadoruLibTest
     {
         static void Main(string[] args)
         {
-            Padoru();
+            Padoru().GetAwaiter().GetResult();
             Console.ReadLine();
         }
 
         /// <summary>
         /// Test functionality of padoru client
         /// </summary>
-        static async void Padoru()
+        static async Task Padoru()
         {
             //init client
             PadoruClient client = new PadoruClient();
