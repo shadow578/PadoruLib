@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace PadoruLib.Padoru
 {
+    /// <summary>
+    /// Client to Retrive Images from a Remote Padoru Collection
+    /// </summary>
     public class PadoruClient
     {
         /// <summary>
