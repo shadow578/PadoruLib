@@ -31,7 +31,7 @@ namespace PadoruLib.Padoru.Model
             get
             {
                 //check we can create a absolute path
-                if (!HasValidImagePath
+                if (!string.IsNullOrWhiteSpace(ImagePath)
                     || ParentCollection == null
                     || !ParentCollection.LoadedLocal
                     || string.IsNullOrWhiteSpace(ParentCollection.LoadedFrom))
@@ -62,11 +62,11 @@ namespace PadoruLib.Padoru.Model
         /// Has this entry a valid (and existing) local image file?
         /// </summary>
         [JsonIgnore]
-        public bool HasValidImagePath
+        public bool HasValidLocalImage
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath);
+                return !string.IsNullOrWhiteSpace(ImagePath);
             }
         }
         #endregion
@@ -226,7 +226,7 @@ namespace PadoruLib.Padoru.Model
         {
             //load the image from local path
             Image entryImg = fallbackImage;
-            if (HasValidImagePath)
+            if (HasValidLocalImage && File.Exists(ImageAbsolutePath))
             {
                 entryImg = Image.FromFile(ImageAbsolutePath);
             }
