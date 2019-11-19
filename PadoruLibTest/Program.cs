@@ -3,15 +3,18 @@ using PadoruLib.Padoru.Model;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PadoruLibTest
 {
     class Program
     {
+        const string COLLECTION_URL = @"https://raw.githubusercontent.com/shadow578/Padoru-Padoru/master/padoru.json";
+
         static void Main(string[] args)
         {
-            Padoru().GetAwaiter().GetResult();
+            PadoruExample().GetAwaiter().GetResult();
             Console.ReadLine();
         }
 
@@ -23,7 +26,7 @@ namespace PadoruLibTest
             //init client
             PadoruClient client = new PadoruClient();
             client.MaxCollectionAge = TimeSpan.FromSeconds(10);//for testing auto resync
-            await client.LoadCollection(@"https://raw.githubusercontent.com/shadow578/Padoru-Padoru/master/padoru.json");
+            await client.LoadCollection(COLLECTION_URL);
 
             //force resync of collection
             await Task.Delay(15);
@@ -41,6 +44,36 @@ namespace PadoruLibTest
             //test image download
             Image rndImg = await randomEntry.GetImage();
             rndImg?.Save("./random.png");
+        }
+
+        /// <summary>
+        /// Example code for github
+        /// </summary>
+        static async Task PadoruExample()
+        {
+            //create client
+            PadoruClient padoru = new PadoruClient();
+
+            //load a padoru collection
+            await padoru.LoadCollection(COLLECTION_URL);
+
+            //create a variable to hold the desired padoru entry
+            PadoruEntry myPadoru;
+
+            //get a random padoru
+            myPadoru = await padoru.GetRandomEntry();
+
+            //get the first padoru in the collection
+            myPadoru = (await padoru.GetEntries()).First();
+
+            //get the first male padoru in the collection
+            myPadoru = (await padoru.GetEntriesWhere((p) => !p.IsFemale)).First();
+
+            //download the padoru image
+            Image padoruImg = await myPadoru.GetImage();
+
+            //save the image
+            padoruImg?.Save("./random-padoru.png");
         }
     }
 }
