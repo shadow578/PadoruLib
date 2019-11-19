@@ -77,6 +77,7 @@ namespace PadoruLib.Padoru.Model
 
                 //set collection source
                 padoru.LoadedFrom = remoteUri.ToString();
+                padoru.LoadedLocal = false;
 
                 //return loaded collection
                 return padoru;

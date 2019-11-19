@@ -14,8 +14,12 @@ namespace PadoruLibTest
         static void Main(string[] args)
         {
             Padoru();
+            Console.ReadLine();
         }
 
+        /// <summary>
+        /// Test functionality of padoru client
+        /// </summary>
         static async void Padoru()
         {
             //init client
@@ -23,15 +27,15 @@ namespace PadoruLibTest
             client.MaxCollectionAge = TimeSpan.FromSeconds(10);//for testing auto resync
             await client.LoadCollection(@"https://raw.githubusercontent.com/shadow578/Padoru-Padoru/master/padoru.json");
 
-            //test get all entries
-            IReadOnlyCollection<PadoruEntry> allEntries = await client.GetEntries();
-
             //force resync of collection
             await Task.Delay(15);
 
+            //test get all entries
+            IReadOnlyCollection<PadoruEntry> allEntries = await client.GetEntries();
+            client.MaxCollectionAge = TimeSpan.FromHours(1);
+
             //test get random entry (with resync)
             PadoruEntry randomEntry = await client.GetRandomEntry();
-            client.MaxCollectionAge = TimeSpan.FromHours(1);
 
             //test get specific entry
             IReadOnlyCollection<PadoruEntry> maleEntries = await client.GetEntriesWhere((p) => !p.IsFemale);
