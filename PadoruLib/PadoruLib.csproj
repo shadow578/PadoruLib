@@ -5,6 +5,15 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject></StartupObject>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>shadow578</Authors>
+    <Description>Library for working with Padoru Image Collections</Description>
+    <Copyright>(C) shadow578, 2019</Copyright>
+    <PackageProjectUrl>https://github.com/shadow578/PadoruLib</PackageProjectUrl>
+    <PackageReleaseNotes>Required Packages:
+-Newtonsoft.Json (12.0.3)
+-System.Drawing.Common (4.6.0)</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
