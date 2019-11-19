@@ -31,7 +31,7 @@ namespace PadoruLib.Padoru.Model
             get
             {
                 //check we can create a absolute path
-                if (!string.IsNullOrWhiteSpace(ImagePath)
+                if (string.IsNullOrWhiteSpace(ImagePath)
                     || ParentCollection == null
                     || !ParentCollection.LoadedLocal
                     || string.IsNullOrWhiteSpace(ParentCollection.LoadedFrom))
@@ -40,8 +40,11 @@ namespace PadoruLib.Padoru.Model
                     return string.Empty;
                 }
 
+                //get collection root
+                string collectionRoot = Path.GetDirectoryName(ParentCollection.LoadedFrom);
+
                 //make absolute path
-                return Util.MakeAbsolutePath(ParentCollection.LoadedFrom, ImagePath);
+                return Util.MakeAbsolutePath(collectionRoot, ImagePath);
             }
         }
 
