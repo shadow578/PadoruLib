@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace PadoruLib.Padoru.Model
@@ -63,13 +64,13 @@ namespace PadoruLib.Padoru.Model
         /// </summary>
         /// <param name="remoteUri">the url to the remote json file</param>
         /// <returns>the loaded collection</returns>
-        public static PadoruCollection FromRemoteJson(Uri remoteUri)
+        public static async Task<PadoruCollection> FromRemoteJson(Uri remoteUri)
         {
             //download uri as string
             using (WebClient web = new WebClient())
             {
                 //download json string
-                string json = web.DownloadString(remoteUri);
+                string json = await web.DownloadStringTaskAsync(remoteUri);
 
                 //deserialize object
                 PadoruCollection padoru = FromJson(json);
