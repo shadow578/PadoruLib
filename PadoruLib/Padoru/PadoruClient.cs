@@ -81,7 +81,7 @@ namespace PadoruLib.Padoru
         /// <param name="predicate">the predicate function used to check if a entry should be included</param>
         /// <remarks>Automatically Re-Syncs the current collection if its out- of- date</remarks>
         /// <returns>a random entry of the current collection</returns>
-        public async Task<IReadOnlyCollection<PadoruEntry>> GetEntry(Func<PadoruEntry, bool> predicate)
+        public async Task<IReadOnlyCollection<PadoruEntry>> GetEntriesWhere(Func<PadoruEntry, bool> predicate)
         {
             //get current collection
             PadoruCollection collection = await GetCurrentCollection();
