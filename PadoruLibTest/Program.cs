@@ -3,6 +3,7 @@ using PadoruLib.Padoru.Model;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,7 +43,13 @@ namespace PadoruLibTest
             IReadOnlyCollection<PadoruEntry> maleEntries = await client.GetEntriesWhere((p) => !p.IsFemale);
 
             //test image download
-            Image rndImg = await randomEntry.GetImage();
+            Image rndImg;
+            using (MemoryStream rndImgStream = new MemoryStream(await randomEntry.GetImageData()))
+            {
+                rndImg = Image.FromStream(rndImgStream);
+            }
+
+            //save image
             rndImg?.Save("./random.png");
         }
 
@@ -69,11 +76,21 @@ namespace PadoruLibTest
             //get the first male padoru in the collection
             myPadoru = (await padoru.GetEntriesWhere((p) => !p.IsFemale)).First();
 
-            //download the padoru image
-            Image padoruImg = await myPadoru.GetImage();
+            //download the padoru image data
+            byte[] padoruData = await myPadoru.GetImageData();
+
+            //create image from the loaded data
+            Image padoruImg;
+            using (MemoryStream padoruDataStream = new MemoryStream(padoruData))
+            {
+                padoruImg = Image.FromStream(padoruDataStream);
+            }
 
             //save the image
             padoruImg?.Save("./random-padoru.png");
+
+            //dispose loaded image
+            padoruImg?.Dispose();
         }
     }
 }

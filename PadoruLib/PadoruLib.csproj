@@ -12,15 +12,13 @@
     <Copyright>(C) shadow578, 2019</Copyright>
     <PackageProjectUrl>https://github.com/shadow578/PadoruLib</PackageProjectUrl>
     <PackageReleaseNotes>Required Packages:
--Newtonsoft.Json (12.0.3)
--System.Drawing.Common (4.6.0)</PackageReleaseNotes>
+-Newtonsoft.Json (12.0.3)</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>

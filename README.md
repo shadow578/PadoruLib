@@ -41,11 +41,21 @@ static async Task PadoruExample()
     //get the first male padoru in the collection
     myPadoru = (await padoru.GetEntriesWhere((p) => !p.IsFemale)).First();
 
-    //download the padoru image
-    Image padoruImg = await myPadoru.GetImage();
+    //download the padoru image data
+    byte[] padoruData = await myPadoru.GetImageData();
+
+    //create image from the loaded data
+    Image padoruImg;
+    using (MemoryStream padoruDataStream = new MemoryStream(padoruData))
+    {
+        padoruImg = Image.FromStream(padoruDataStream);
+    }
 
     //save the image
     padoruImg?.Save("./random-padoru.png");
+
+    //dispose loaded image
+    padoruImg?.Dispose();
 }
 ```
 

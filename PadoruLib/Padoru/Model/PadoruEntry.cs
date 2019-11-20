@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PadoruLib.Utility;
 using System;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -164,18 +163,17 @@ namespace PadoruLib.Padoru.Model
         /// Get this entry's image, either from the local file, or the remote url
         /// </summary>
         /// <remarks>Local file is favoured</remarks>
-        /// <param name="fallbackImage">the image to fall back in case no image can be loaded</param>
-        /// <returns>the loaded image, or the value of fallbackImage</returns>
-        public async Task<Image> GetImage(Image fallbackImage = null)
+        /// <returns>the loaded image, or null if load failed</returns>
+        public async Task<byte[]> GetImageData()
         {
-            Image entryImg = null;
+            byte[] imgData = null;
 
             //try loading local image if parent was loaded locally
             if (ParentCollection != null && ParentCollection.LoadedLocal)
             {
                 try
                 {
-                    entryImg = GetImageLocal();
+                    imgData = GetImageDataLocal();
                 }
                 catch (Exception) { }
             }
@@ -183,37 +181,29 @@ namespace PadoruLib.Padoru.Model
             //if entryImg is still null a local load wasn't attempted or failed, try to get remote image
             try
             {
-                entryImg = await GetImageRemote();
+                imgData = await GetImageDataRemote();
             }
             catch (Exception) { }
 
-            //image is still null, use fallback image
-            if (entryImg == null)
-            {
-                entryImg = fallbackImage;
-            }
-
             //return loaded image
-            return entryImg;
+            return imgData;
         }
 
         /// <summary>
         /// Get this entry's image from the image url
         /// </summary>
-        /// <param name="fallbackImage">the image to fall back in case no image can be loaded</param>
-        /// <returns>the loaded image, or the value of fallbackImage</returns>
-        public async Task<Image> GetImageRemote(Image fallbackImage = null)
+        /// <returns>the loaded image, or null if load failed</returns>
+        public async Task<byte[]> GetImageDataRemote()
         {
             //download image from the remote url
-            Image entryImg = fallbackImage;
+            byte[] entryImg = null;
             if (HasValidImageUrl)
             {
                 //download image into memory stream
                 using (WebClient web = new WebClient())
-                using (MemoryStream imgStream = new MemoryStream(await web.DownloadDataTaskAsync(ImageUrl)))
                 {
                     //load image from stream
-                    entryImg = Image.FromStream(imgStream);
+                    entryImg = await web.DownloadDataTaskAsync(ImageUrl);
                 }
             }
 
@@ -223,15 +213,14 @@ namespace PadoruLib.Padoru.Model
         /// <summary>
         /// Get this entry's image from the local path
         /// </summary>
-        /// <param name="fallbackImage">the image to fall back in case no image can be loaded</param>
-        /// <returns>the loaded image, or the value of fallbackImage</returns>
-        public Image GetImageLocal(Image fallbackImage = null)
+        /// <returns>the loaded image, or null if load failed</returns>
+        public byte[] GetImageDataLocal()
         {
             //load the image from local path
-            Image entryImg = fallbackImage;
+            byte[] entryImg = null;
             if (HasValidLocalImage && File.Exists(ImageAbsolutePath))
             {
-                entryImg = Image.FromFile(ImageAbsolutePath);
+                entryImg = File.ReadAllBytes(ImageAbsolutePath);
             }
 
             return entryImg;
