@@ -149,8 +149,11 @@ namespace PadoruLib.Padoru.Model
             //check parent collection was loaded locally
             if (ParentCollection == null || !ParentCollection.LoadedLocal) throw new InvalidOperationException("The Parent Collection has to be loaded locally!");
 
+            //get collection root
+            string collectionRoot = Path.GetDirectoryName(ParentCollection.LoadedFrom);
+
             //make relative path
-            string relative = Util.MakeRelativePath(ParentCollection.LoadedFrom, absoluteImagePath);
+            string relative = Util.MakeRelativePath(collectionRoot, absoluteImagePath);
 
             //check the relative path is ok
             if (string.IsNullOrWhiteSpace(relative)) throw new InvalidOperationException("The Absolute path was invalid or no child of the Collection root directory!");
