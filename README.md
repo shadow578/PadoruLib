@@ -1,5 +1,6 @@
 # PadoruLib
-C# Library for retrieving images from [my Padoru collection](https://github.com/shadow578/Padoru-Padoru)
+C# Library for retrieving images from [my Padoru collection](https://github.com/shadow578/Padoru-Padoru)<br>
+The JSON Format is described [here.](https://github.com/shadow578/PadoruLib/blob/master/Model.md)
 
 # What is this?
 This is a small & simple library to make it easier to work with my padoru-padoru repo.
