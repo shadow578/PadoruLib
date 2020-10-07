@@ -23,14 +23,14 @@ namespace PadoruLib.Padoru.Model
         /// The absolute image path inside the local collection directory of the parent collection
         /// </summary>
         /// <remarks>returns string.empty if parent collection is null, 
-        /// HasValidImagePath is false, OR parent collection was not loaded from a local file</remarks>
+        /// OR parent collection was not loaded from a local file</remarks>
         [JsonIgnore]
         public string ImageAbsolutePath
         {
             get
             {
                 //check we can create a absolute path
-                if (string.IsNullOrWhiteSpace(ImagePath)
+                if (string.IsNullOrWhiteSpace(Image)
                     || ParentCollection == null
                     || !ParentCollection.LoadedLocal
                     || string.IsNullOrWhiteSpace(ParentCollection.LoadedFrom))
@@ -43,7 +43,30 @@ namespace PadoruLib.Padoru.Model
                 string collectionRoot = Path.GetDirectoryName(ParentCollection.LoadedFrom);
 
                 //make absolute path
-                return Util.MakeAbsolutePath(collectionRoot, ImagePath);
+                return Util.MakeAbsolutePath(collectionRoot, Image);
+            }
+        }
+
+        /// <summary>
+        /// The full url to the remote image
+        /// </summary>
+        /// <remarks>returns string.empty if parent collection is null</remarks>
+        [JsonIgnore]
+        public string ImageRemoteURL
+        {
+            get
+            {
+                //check we can create a absolute url
+                if (string.IsNullOrWhiteSpace(Image)
+                    || ParentCollection == null
+                    || string.IsNullOrWhiteSpace(ParentCollection.BaseURL))
+                {
+                    //no valid image url can be created
+                    return string.Empty;
+                }
+
+                //join relative image path with url base
+                return ParentCollection.BaseURL + Image;
             }
         }
 
@@ -56,7 +79,8 @@ namespace PadoruLib.Padoru.Model
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(ImageUrl) && Uri.IsWellFormedUriString(ImageUrl, UriKind.Absolute);
+                string remote = ImageRemoteURL;
+                return !string.IsNullOrWhiteSpace(remote) && Uri.IsWellFormedUriString(remote, UriKind.Absolute);
             }
         }
 
@@ -68,7 +92,8 @@ namespace PadoruLib.Padoru.Model
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(ImagePath);
+                string path = ImageAbsolutePath;
+                return !string.IsNullOrWhiteSpace(path) && File.Exists(path);
             }
         }
         #endregion
@@ -80,14 +105,14 @@ namespace PadoruLib.Padoru.Model
         public Guid UID { get; set; }
 
         /// <summary>
-        /// The Image url (in the github repo)
+        /// The relative image path (both local and remote)
         /// </summary>
-        public string ImageUrl { get; set; }
+        public string Image { get; set; }
 
         /// <summary>
-        /// The relative image path inside the local collection directory
+        /// size of the image, in bytes
         /// </summary>
-        public string ImagePath { get; set; }
+        public long ImageSize { get; set; } = -1;
 
         /// <summary>
         /// This Character's name
@@ -95,9 +120,23 @@ namespace PadoruLib.Padoru.Model
         public string Name { get; set; }
 
         /// <summary>
-        /// Is this a (canonically) female Character?
+        /// Is this a (appearance) female Character?
+        /// - Astolfo would be female with this logic
         /// </summary>
         public bool IsFemale { get; set; }
+
+        /// <summary>
+        /// Is this a (appearance) human- like character?
+        /// - non- humanoid would be stuff like "truck- kun"
+        /// </summary>
+        public bool IsHumanoid { get; set; }
+
+        /// <summary>
+        /// is this padoru in the "normal" / original form?
+        /// - non- standard stuff like "truck- kun" etc. are not normal
+        /// - also, if it's a normal padoru but with a speech bubble, its also not normal
+        /// </summary>
+        public bool IsNormal { get; set; }
 
         /// <summary>
         /// This Character's name in MAL
@@ -158,8 +197,11 @@ namespace PadoruLib.Padoru.Model
             //check the relative path is ok
             if (string.IsNullOrWhiteSpace(relative)) throw new InvalidOperationException("The Absolute path was invalid or no child of the Collection root directory!");
 
-            //relative path ok, set it
-            ImagePath = relative;
+            //replace backwards slash with forwards slash, also trim any leading slashes
+            relative = relative.Replace('\\', '/').TrimStart('/');
+
+            //path ok, set it
+            Image = relative;
         }
 
         /// <summary>
@@ -206,7 +248,7 @@ namespace PadoruLib.Padoru.Model
                 using (WebClient web = new WebClient())
                 {
                     //load image from stream
-                    entryImg = await web.DownloadDataTaskAsync(ImageUrl);
+                    entryImg = await web.DownloadDataTaskAsync(ImageRemoteURL);
                 }
             }
 
@@ -221,7 +263,7 @@ namespace PadoruLib.Padoru.Model
         {
             //load the image from local path
             byte[] entryImg = null;
-            if (HasValidLocalImage && File.Exists(ImageAbsolutePath))
+            if (HasValidLocalImage)
             {
                 entryImg = File.ReadAllBytes(ImageAbsolutePath);
             }

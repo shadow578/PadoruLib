@@ -28,15 +28,28 @@ namespace PadoruLib.Padoru.Model
         #endregion
 
         #region Serialized Properties
+
         /// <summary>
-        /// The Entries in this collection
+        /// Version of the Collection format used.
+        /// Added in Version 2, so default is 1
         /// </summary>
-        public List<PadoruEntry> Entries { get; set; }
+        [JsonProperty("Version")]
+        public int FormatVersion { get; set; } = 1;
+
+        /// <summary>
+        /// Base url of the collection, to reconstruct relative image urls
+        /// </summary>
+        public string BaseURL { get; set; }
 
         /// <summary>
         /// When was the last change to this collection made?
         /// </summary>
         public DateTime LastChange { get; set; }
+
+        /// <summary>
+        /// The Entries in this collection
+        /// </summary>
+        public List<PadoruEntry> Entries { get; set; }
         #endregion
 
         #region Functions
